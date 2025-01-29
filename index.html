@@ -5,7 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weight Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <style>
+    /* Chart Container Fix */
+    #chartContainer {
+      width: 100%;
+      max-width: 800px;
+      height: 400px; /* Fixed height */
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    #progressChart {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <div id="chartContainer">
+    <canvas id="progressChart"></canvas>
+  </div>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycby9GJxS2zD_JuTujZKptvSu2G7s3j_ei_XOR5yx8hqFKCiIC8xOVwTTGCyVkfGIS2uT/exec"; 
+    let chartInstance = null; // Store the chart instance globally
+
+    async function updateChart() {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      const labels = data.map(entry => `${entry.date} ${entry.time}`);
+      const weights = data.map(entry => entry.weight);
+
+      const ctx = document.getElementById('progressChart').getContext('2d');
+
+      // Destroy existing chart before creating a new one
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Weight (kg)',
+              data: weights,
+              borderColor: '#4a90e2',
+              backgroundColor: 'rgba(74, 144, 226, 0.1)',
+              borderWidth: 2,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Now properly constrained by CSS
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Weight (kg)',
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date and Time',
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+          },
+        },
+      });
+    }
+
+    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const weight = document.getElementById('weight').value;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, time, weight }),
+      });
+
+      if (response.ok) {
+        alert('Data added successfully!');
+        updateChart();
+      } else {
+        alert('Error adding data.');
+      }
+    });
+
+    updateChart();
+  </script>
+
 </head>
 <body>
   <h1>Weight Tracker</h1>

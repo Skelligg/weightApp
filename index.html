@@ -130,9 +130,14 @@
     const apiUrl = "https://script.google.com/macros/s/AKfycby9GJxS2zD_JuTujZKptvSu2G7s3j_ei_XOR5yx8hqFKCiIC8xOVwTTGCyVkfGIS2uT/exec"; 
     let chartInstance = null; 
   
-    function formatDate(dateString) {
-      let dateObj = new Date(dateString);
-      if (isNaN(dateObj.getTime())) return dateString; // If invalid, return as is
+    function formatDate(rawDate) {
+      if (!rawDate) return '';
+  
+      // If rawDate is already formatted correctly, return it
+      if (rawDate.includes('-')) return rawDate;
+  
+      let dateObj = new Date(rawDate);
+      if (isNaN(dateObj.getTime())) return rawDate; // If invalid, return as is
   
       let day = String(dateObj.getDate()).padStart(2, '0');
       let month = String(dateObj.getMonth() + 1).padStart(2, '0'); 
@@ -141,9 +146,17 @@
       return `${day}-${month}-${year}`;
     }
   
-    function formatTime(timeString) {
-      let timeParts = timeString.split(':'); // Extract hours, minutes, seconds
-      if (timeParts.length < 2) return timeString; // Return as is if invalid
+    function formatTime(rawTime) {
+      if (!rawTime) return '';
+  
+      // Handle cases where time is stored as full timestamp
+      if (rawTime.includes('T')) {
+        let timePart = rawTime.split('T')[1]; // Extract time portion
+        rawTime = timePart.split('.')[0]; // Remove milliseconds
+      }
+  
+      let timeParts = rawTime.split(':'); // Extract hours, minutes, seconds
+      if (timeParts.length < 2) return rawTime; // Return as is if invalid
   
       let hours = String(timeParts[0]).padStart(2, '0');
       let minutes = String(timeParts[1]).padStart(2, '0');
@@ -156,7 +169,12 @@
       const data = await response.json();
   
       // Format date and time properly before displaying
-      const labels = data.map(entry => `${formatDate(entry.date)} ${formatTime(entry.time)}`);
+      const labels = data.map(entry => {
+        let cleanDate = formatDate(entry.date);
+        let cleanTime = formatTime(entry.time);
+        return `${cleanDate} ${cleanTime}`;
+      });
+  
       const weights = data.map(entry => entry.weight);
   
       const ctx = document.getElementById('progressChart').getContext('2d');
@@ -230,6 +248,7 @@
   
     updateChart();
   </script>
+  
   
 </body>
 </html>

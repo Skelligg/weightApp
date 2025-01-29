@@ -5,19 +5,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weight Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #4a90e2;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #333;
+      margin-top: 30px;
+    }
+
+    /* Form Styles */
+    #dataForm {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      margin-bottom: 20px;
+    }
+
+    #dataForm label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    #dataForm input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    #dataForm button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #dataForm button:hover {
+      background-color: #357abd;
+    }
+
+    /* Chart Styles */
+    #progressChart {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      #dataForm {
+        width: 90%;
+      }
+
+      #progressChart {
+        width: 90%;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1>Weight Tracker</h1>
   <form id="dataForm">
     <label for="date">Date:</label>
     <input type="date" id="date" required>
-    <br>
     <label for="time">Time:</label>
     <input type="time" id="time" required>
-    <br>
     <label for="weight">Weight (kg):</label>
     <input type="number" step="0.1" id="weight" required>
-    <br>
     <button type="submit">Add Data</button>
   </form>
 
@@ -44,15 +129,35 @@
             {
               label: 'Weight (kg)',
               data: weights,
-              borderColor: 'blue',
-              fill: false,
+              borderColor: '#4a90e2',
+              backgroundColor: 'rgba(74, 144, 226, 0.1)',
+              borderWidth: 2,
+              fill: true,
             },
           ],
         },
         options: {
+          responsive: true,
+          maintainAspectRatio: false,
           scales: {
             y: {
               beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Weight (kg)',
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date and Time',
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
             },
           },
         },
@@ -68,6 +173,9 @@
 
       const response = await fetch(apiUrl, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ date, time, weight }),
       });
 

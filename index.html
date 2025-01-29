@@ -89,8 +89,15 @@
       }
 
       #progressChart {
-        width: 90%;
-      }
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 100%;
+  height: 400px; /* Fixed height */
+  margin-bottom: 30px;
+}
     }
   </style>
 </head>
@@ -122,46 +129,46 @@
 
       const ctx = document.getElementById('progressChart').getContext('2d');
       new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Weight (kg)',
-              data: weights,
-              borderColor: '#4a90e2',
-              backgroundColor: 'rgba(74, 144, 226, 0.1)',
-              borderWidth: 2,
-              fill: true,
-            },
-          ],
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Weight (kg)',
+        data: weights,
+        borderColor: '#4a90e2',
+        backgroundColor: 'rgba(74, 144, 226, 0.1)',
+        borderWidth: 2,
+        fill: true,
+      },
+    ],
+  },
+  options: {
+    responsive: true, // Make the chart responsive
+    maintainAspectRatio: false, // Allow custom height
+    scales: {
+      y: {
+        beginAtZero: false,
+        title: {
+          display: true,
+          text: 'Weight (kg)',
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: false,
-              title: {
-                display: true,
-                text: 'Weight (kg)',
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Date and Time',
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top',
-            },
-          },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Date and Time',
         },
-      });
+      },
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+    },
+  },
+});
     }
 
     // Function to submit data
